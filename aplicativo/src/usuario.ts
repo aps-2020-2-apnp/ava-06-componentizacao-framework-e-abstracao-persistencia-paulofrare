@@ -1,34 +1,24 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { Command } from './Command'
-import { Database } from 'sqlite3'
+import { list, insert, deleteById } from './dbaccess';
 
-const db = new Database('./banco.db')
+const users = "usuarios"
+const fields = "(nome,sobrenome)"
+const values = "(?,?)"
 
-// GET /usuarios
-class TodosUsuariosCommand implements Command {
+export const allUsersCommand = {
   execute(req: IncomingMessage, resp: ServerResponse): void {
-    db.all('SELECT * FROM usuarios', (erro, registros) => {
-      resp.writeHead(200, {'Content-Type': 'application/json'})
-      resp.end(JSON.stringify(registros))
-    })
+    list(resp, users)
   }
 }
 
-export const todosUsuariosCommand = new TodosUsuariosCommand()
-
-export const novoUsuarioCommand = { // objeto literal
+export const newUserCommand = {
   execute(req: IncomingMessage, resp: ServerResponse): void {
-    let corpo = ''
-    req.on('data', (parte) => corpo += parte)
-    req.on('end', () => {
-      const usuario = JSON.parse(corpo)
-      const sql = 'INSERT INTO usuarios (nome, sobrenome) VALUES (?, ?)'
-      const statement = db.prepare(sql)
-      statement.run(usuario.nome, usuario.sobrenome)
-      statement.finalize(() => {
-        resp.writeHead(201, { 'Content-Type': 'text/plain' })
-        resp.end('Usuario Criado')
-      })
-    })
+    insert(req, resp, users, fields, values)
+  }
+}
+
+export const deleteUserCommand = {
+  execute(req: IncomingMessage, resp: ServerResponse): void {
+    deleteById(req, resp, users)
   }
 }

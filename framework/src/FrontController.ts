@@ -3,7 +3,7 @@ import { parse } from 'url'
 import { Command } from './Command'
 
 // NOP = no operation
-const NULL_COMMAND = {
+export const NULL_COMMAND = {
   execute(req: IncomingMessage, resp: ServerResponse): void {
     resp.writeHead(204)
     resp.end()
@@ -15,7 +15,7 @@ export class FrontController {
   private routing: Record<string, Record<string, Command>> = {}
 
   // registrar os comandos
-  register(method: Method, path: string, command: Command = NULL_COMMAND) {
+  register(method: Method, path: string, command: Command = NULL_COMMAND):void {
     if (!this.routing[path]) this.routing[path] = {}
     this.routing[path][method] = command
   }

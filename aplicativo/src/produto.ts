@@ -1,17 +1,25 @@
+
 import { IncomingMessage, ServerResponse } from 'http';
-import { Command } from './Command'
-import { Database } from 'sqlite3'
+import { list, insert, deleteById } from './dbaccess'
 
-const db = new Database('./banco.db')
+const products = "produtos"
+const fields = "(nome, preco)"
+const values = "(?,?)"
 
-// GET /produtos
-class TodosProdutosCommand implements Command {
+export const allProductsCommand = {
   execute(req: IncomingMessage, resp: ServerResponse): void {
-    db.all('SELECT * FROM produtos', (erro, registros) => {
-      resp.writeHead(200, {'Content-Type': 'application/json'})
-      resp.end(JSON.stringify(registros))
-    })
+    list(resp, products)
   }
 }
 
-export const todosUsuariosCommand = new TodosProdutosCommand()
+export const newProductCommand = {
+  execute(req: IncomingMessage, resp: ServerResponse): void {
+    insert(req, resp, products, fields, values)
+  }
+}
+
+export const deleteProductCommand = {
+  execute(req: IncomingMessage, resp: ServerResponse): void {
+    deleteById(req, resp, products)
+  }
+}
